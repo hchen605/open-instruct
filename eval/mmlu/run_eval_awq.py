@@ -158,6 +158,8 @@ def main(args):
             load_in_8bit=args.load_in_8bit, 
             device_map="balanced_low_0" if torch.cuda.device_count() > 1 else "auto",
             awq_model=args.awq,
+            lora=args.lora,
+            lora_path=args.lora_path
         )
         # quant_config = { "zero_point": True, "q_group_size": 128, "w_bit": 4, "version": "GEMM" }
         # model = AutoAWQForCausalLM.from_pretrained(args.model_name_or_path)
@@ -357,6 +359,11 @@ if __name__ == "__main__":
         help="If given, we're evaluating a 4-bit quantized GPTQ model."
     )
     parser.add_argument(
+        "--lora",
+        action="store_true",
+        help="If given, we're evaluating a 4-bit quantized GPTQ model."
+    )
+    parser.add_argument(
         "--use_chat_format", 
         action="store_true", 
         help="If given, we will use the chat format for the prompts."
@@ -376,6 +383,12 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--hf_upload_name",
+        type=str,
+        default=None,
+        help="If uploading to hf, this is the model name"
+    )
+    parser.add_argument(
+        "--lora_path",
         type=str,
         default=None,
         help="If uploading to hf, this is the model name"

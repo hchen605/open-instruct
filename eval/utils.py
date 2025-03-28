@@ -260,6 +260,8 @@ def load_hf_lm(
         convert_to_half=False,
         gptq_model=False,
         awq_model=False,
+        lora=False,
+        lora_path=None,
         token=os.getenv("HF_TOKEN", None),
     ):
 
@@ -284,6 +286,10 @@ def load_hf_lm(
             model_name_or_path, device="cuda:0", use_triton=True, fuse_layers=False
         )
         model = model_wrapper.model
+        if lora:
+            from peft import PeftModel
+            model = PeftModel.from_pretrained(model, lora_path)
+            print('QLoRA model loaded')
     elif load_in_8bit:
         model = AutoModelForCausalLM.from_pretrained(
             model_name_or_path, 

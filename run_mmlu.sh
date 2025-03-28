@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -J job_id
-#SBATCH -o ./log/llama3-8b-awq-4bit-mmlu.out
+#SBATCH -o ./log/llama3-8b-awq-4bit-2k-lora-mmlu.out
 #SBATCH --gres=gpu:1 #Number of GPU devices to use [0-2]
 #SBATCH --nodelist=leon05 #YOUR NODE OF PREFERENCE
 
@@ -26,13 +26,26 @@ module load shared singularity
 
 #singularity exec --nv ./img/awq-openai-triton.img pip list
 # eval mmlu awq #../LLM-Pruner/img/llm-pruner-awq.img\
-singularity exec --nv ./img/awq-openai-triton.img \
+# singularity exec --nv ./img/awq-openai-triton.img \
+#     python -m eval.mmlu.run_eval_awq \
+#     --ntrain 0 \
+#     --data_dir data_mmlu \
+#     --save_dir results/mmlu/llama3-8B-awq-4bit-0shot \
+#     --model_name_or_path /home/hsin/AutoAWQ/Llama-3-8B-AWQ \
+#     --tokenizer_name_or_path /home/hsin/AutoAWQ/Llama-3-8B-AWQ \
+#     --awq \
+#     --eval_batch_size 16 \
+
+# eval mmlu awq-lora 
+singularity exec --nv ./img/awq-openai-triton-peft.img \
     python -m eval.mmlu.run_eval_awq \
     --ntrain 0 \
     --data_dir data_mmlu \
-    --save_dir results/mmlu/llama3-8B-awq-4bit-0shot \
+    --save_dir results/mmlu/llama3-8B-awq-4bit-2k-lora-0shot \
     --model_name_or_path /home/hsin/AutoAWQ/Llama-3-8B-AWQ \
     --tokenizer_name_or_path /home/hsin/AutoAWQ/Llama-3-8B-AWQ \
-    --awq \
+    --awq --lora \
+    --lora_path /home/hsin/AutoAWQ/Llama-3-8B-AWQ-2k-lora-8-16 \
     --eval_batch_size 16 \
+
 
