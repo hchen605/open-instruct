@@ -259,6 +259,7 @@ def load_hf_lm(
         load_in_8bit=False, 
         convert_to_half=False,
         gptq_model=False,
+        awq_model=False,
         token=os.getenv("HF_TOKEN", None),
     ):
 
@@ -277,6 +278,12 @@ def load_hf_lm(
             model_name_or_path, device="cuda:0", use_triton=True, trust_remote_code=trust_remote_code
         )
         model = model_wrapper.model  
+    elif awq_model:
+        from awq import AutoAWQForCausalLM
+        model_wrapper = AutoAWQForCausalLM.from_quantized(
+            model_name_or_path, device="cuda:0", use_triton=True, fuse_layers=False
+        )
+        model = model_wrapper.model
     elif load_in_8bit:
         model = AutoModelForCausalLM.from_pretrained(
             model_name_or_path, 
